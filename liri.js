@@ -10,6 +10,8 @@ var client = new twitter(keys.twitter);
 
 //grabs user command
 var LiriCommand = process.argv[2]
+//grabs song or movie title
+var UserInput = process.argv[3]
 
 //command logic 
 switch (LiriCommand){
@@ -44,5 +46,30 @@ switch (LiriCommand){
       });
     }
 
+    function getSpotifySong (){
+        var SongTitle = UserInput
+
+        if(!SongTitle){
+            SongTitle = "ironic";
+        }
+    
+        params = SongTitle
+        spotify.search({ type: 'track', query: params, limit: 10 }, function(err, data) {
+            if (err) {
+              return console.log('Error occurred: ' + err);
+            } else {
+
+                for (let i = 0; i < 10; i++) {
+                
+                console.log( "ARTIST:  " + data.tracks.items[i].album.artists[0].name);
+                console.log("SONG TITLE:  " + data.tracks.items[0].name);
+                console.log("ALBUM:  " + data.tracks.items[i].album.name);
+                console.log("PREVIEW URL:  " + data.tracks.items[i].preview_url)
+                console.log("****************************************************************************");
+                }
+          }
+    });
 
 
+
+    }
