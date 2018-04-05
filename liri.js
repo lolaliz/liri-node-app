@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 var fs = require("fs"); //reads and writes files
-//var request = require("request");
+var request = require("request");
 var keys = require("./keys.js");
 var twitter = require ("twitter")
 var Spotify = require('node-spotify-api');
@@ -12,7 +12,9 @@ var client = new twitter(keys.twitter);
 var LiriCommand = process.argv[2]
 //grabs song or movie title
 var UserInput = process.argv[3]
-
+//var SongTitle = UserInput
+//var [nope, nomore, ...UserInput] = process.argv
+//var UserInput = UserInput.join(" ")
 //command logic 
 switch (LiriCommand){
     case "my-tweets":
@@ -48,17 +50,17 @@ switch (LiriCommand){
 
     function getSpotifySong (){
         var SongTitle = UserInput
-
+        //var [nope, nomore, ...SongTitle] = process.argv
+        //params = SongTitle
         if(!SongTitle){
-            SongTitle = "ironic";
+            SongTitle = "yellow submarine";
         }
     
         params = SongTitle
+        
         spotify.search({ type: 'track', query: params, limit: 10 }, function(err, data) {
-            if (err) {
-              return console.log('Error occurred: ' + err);
-            } else {
-
+            if (!err) {
+               
                 for (let i = 0; i < 10; i++) {
                 
                 console.log( "ARTIST:  " + data.tracks.items[i].album.artists[0].name);
@@ -67,9 +69,41 @@ switch (LiriCommand){
                 console.log("PREVIEW URL:  " + data.tracks.items[i].preview_url)
                 console.log("****************************************************************************");
                 }
+          } else {
+              console.log ("error occurred:", err)
           }
     });
+ }
 
+ 
 
+ function getMovieInfo (){
+    
+    var MovieTitle = UserInput
 
+    if (!MovieTitle) {
+        MovieTitle = "mr nobody"
     }
+    
+    request('http://www.omdbapi.com/?t=' + MovieTitle +"&y=&plot=short&apikey=trilogy" , function (error, response, body) {
+      
+      //console.log('error:', error)
+      if (!error && response.statusCode === 200) {
+      console.log("MOVIE TITLE:", JSON.parse (body).Title)
+      console.log("RELEASE DATE:", JSON.parse (body).Released)
+      console.log("IMDB RATING:", JSON.parse (body).Ratings[0].Value)
+      console.log("ROTTEN TOMATOES RATING:", JSON.parse (body).Ratings[1].Value)
+      console.log("COUNTRY:", JSON.parse (body).Country)
+      console.log("LANGUAGES:", JSON.parse (body).Language)
+      console.log("PLOT:", JSON.parse (body).Plot)
+      console.log("ACTORS:", JSON.parse (body).Actors)
+      } else {
+          console.log ("error:", error)
+      }
+
+ })
+
+}
+
+
+
