@@ -11,10 +11,8 @@ var client = new twitter(keys.twitter);
 //grabs user command
 var LiriCommand = process.argv[2]
 //grabs song or movie title
-var UserInput = process.argv[3]
-//var SongTitle = UserInput
-//var [nope, nomore, ...UserInput] = process.argv
-//var UserInput = UserInput.join(" ")
+var [nope, nomore, stillno, ...UserInput] = process.argv
+
 //command logic 
 switch (LiriCommand){
     case "my-tweets":
@@ -38,20 +36,28 @@ switch (LiriCommand){
        var params = {screen_name: 'kitlolakat'}
        client.get('statuses/user_timeline', params, function(error, tweets, response) {
         if (!error) {
+            var divider = "*********"
             for(var i = 0; i<tweets.length; i++){
                 var tweetDate = tweets[i].created_at;
                 console.log("@kitlolakat: " + tweets[i].text + ", " + "Created at: " + tweetDate)
                 console.log("======================================================================================")
-            }
-         
-        }
-      });
+
+                //add text to log.txt
+                fs.appendFile('log.txt', "@kitlolakat: " + tweets[i].text + ", " + "Created at: " + tweetDate + divider, function (error) {
+                    if (error) throw error;
+                    //else {console.log ("saved!")}
+                });
+                
+            } 
+             }
+                    
+        });
     }
+
 
     function getSpotifySong (){
         var SongTitle = UserInput
-        //var [nope, nomore, ...SongTitle] = process.argv
-        //params = SongTitle
+        
         if(!SongTitle){
             SongTitle = "yellow submarine";
         }
@@ -75,7 +81,7 @@ switch (LiriCommand){
     });
  }
 
- 
+
 
  function getMovieInfo (){
     
@@ -87,7 +93,7 @@ switch (LiriCommand){
     
     request('http://www.omdbapi.com/?t=' + MovieTitle +"&y=&plot=short&apikey=trilogy" , function (error, response, body) {
       
-      //console.log('error:', error)
+      
       if (!error && response.statusCode === 200) {
       console.log("MOVIE TITLE:", JSON.parse (body).Title)
       console.log("RELEASE DATE:", JSON.parse (body).Released)
@@ -97,6 +103,8 @@ switch (LiriCommand){
       console.log("LANGUAGES:", JSON.parse (body).Language)
       console.log("PLOT:", JSON.parse (body).Plot)
       console.log("ACTORS:", JSON.parse (body).Actors)
+
+      //
       } else {
           console.log ("error:", error)
       }
@@ -105,5 +113,16 @@ switch (LiriCommand){
 
 }
 
-
+function getRandomTxt(){
+    fs.readFile('random.txt', 'utf8', function (error,data)  {
+        if (error) {return console.log("error")}
+    
+       //not working!!!!! will not follow command!!!
+        var rdmtxt = data.split(',')
+       // var command = rdmtxt[1]
+        console.log (rdmtxt)
+        //var rdmparam = UserInput
+       getSpotifySong(rdmtxt[1])
+    })
+}
 
